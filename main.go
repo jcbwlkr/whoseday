@@ -21,6 +21,11 @@ import (
 	"golang.org/x/mobile/gl"
 )
 
+const (
+	width  = 100
+	height = 100
+)
+
 var (
 	startTime = time.Now()
 
@@ -94,25 +99,45 @@ func loadScene() {
 		{0, 1, 0},
 	})
 
-	x, y := float32(1), float32(1)
+	var x, y float32
+	dx, dy := float32(1), float32(1)
 
 	n := newNode()
 	// TODO do I need this arranger thing?
 	n.Arranger = arrangerFunc(func(eng sprite.Engine, n *sprite.Node, t clock.Time) {
 		eng.SetSubTex(n, kid)
 
-		w, h := float32(sz.Size().X), float32(sz.Size().Y)
+		if x < 0 {
+			dx = 1
+		}
+		if y < 0 {
+			dy = 1
+		}
+		if x+width > float32(sz.WidthPt) {
+			dx = -1
+		}
+		if y+height > float32(sz.HeightPt) {
+			dy = -1
+		}
 
+		x += dx
+		y += dy
 		eng.SetTransform(n, f32.Affine{
-			{w, 0, x},
-			{0, h, y},
+			{width, 0, x},
+			{0, height, y},
 		})
 	})
 }
 
 func loadKid() sprite.SubTex {
-	// TODO check date
-	a, err := asset.Open("kell.jpeg")
+	d := time.Since(time.Time{})
+
+	file := "carter.jpeg"
+	if int(d.Hours()/24)%2 == 0 {
+		file = "kell.jpeg"
+	}
+
+	a, err := asset.Open(file)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -126,6 +151,7 @@ func loadKid() sprite.SubTex {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	return sprite.SubTex{T: t, R: image.Rect(0, 0, 360, 300)}
 }
 
