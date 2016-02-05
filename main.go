@@ -130,12 +130,7 @@ func loadScene() {
 }
 
 func loadKid() sprite.SubTex {
-	d := time.Since(time.Time{})
-
-	file := "carter.jpeg"
-	if int(d.Hours()/24)%2 == 0 {
-		file = "kell.jpeg"
-	}
+	file := picForDay(time.Now())
 
 	a, err := asset.Open(file)
 	if err != nil {
@@ -152,9 +147,19 @@ func loadKid() sprite.SubTex {
 		log.Fatal(err)
 	}
 
-	return sprite.SubTex{T: t, R: image.Rect(0, 0, 360, 300)}
+	return sprite.SubTex{T: t, R: image.Rect(0, 0, 466, 466)}
 }
 
 type arrangerFunc func(e sprite.Engine, n *sprite.Node, t clock.Time)
 
 func (a arrangerFunc) Arrange(e sprite.Engine, n *sprite.Node, t clock.Time) { a(e, n, t) }
+
+func picForDay(day time.Time) string {
+	d := day.Sub(time.Date(2016, time.January, 1, 0, 0, 0, 0, time.Local))
+
+	if int(d.Hours()/24)%2 == 0 {
+		return "carter.jpeg"
+	}
+
+	return "kell.jpeg"
+}
